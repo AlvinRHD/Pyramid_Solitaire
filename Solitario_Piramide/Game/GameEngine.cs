@@ -24,7 +24,7 @@ namespace Solitario_Piramide.Game
 
         public void Run()
         {
-            SoundManager.PlayBackgroundMusic();
+            //SoundManager.PlayBackgroundMusic();
             menu.ShowWelcomeMenu();
 
             bool playAgain = true;
@@ -48,7 +48,7 @@ namespace Solitario_Piramide.Game
                 if (move.HasValue)
                 {
                     ExecuteMove(move.Value);  // Aquí desreferenciamos el valor nullable
-                    SoundManager.PlayCardFlipSound();
+                    //SoundManager.PlayCardFlipSound();
                 }
 
                 gameWon = CheckWinCondition();
