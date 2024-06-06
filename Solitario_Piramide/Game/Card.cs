@@ -6,7 +6,17 @@ using System.Threading.Tasks;
 
 namespace Solitario_Piramide.Game
 {
-    internal class Card
+    public class Card
     {
+        public int Value { get; }
+        public string Suit { get; }
+        public bool IsFaceUp { get; set; }
+
+        public Card(int value, string suit)
+        {
+            Value = value;
+            Suit = suit;
+            IsFaceUp = false;
+        }
     }
 }
