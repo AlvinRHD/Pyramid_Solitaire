@@ -1,4 +1,4 @@
-﻿namespace PyramidSolitaire.Game
+﻿namespace Solitario_Piramide.Game
 {
     public class Card
     {

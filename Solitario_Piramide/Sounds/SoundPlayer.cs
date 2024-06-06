@@ -2,10 +2,10 @@
 
 namespace Solitario_Piramide.Sound
 {
-    public static class SoundPlayer
+    public static class SoundManager
     {
-        private static readonly SoundPlayer backgroundMusic = new SoundPlayer("Sounds/Background.wav");
-        private static readonly SoundPlayer cardFlipSound = new SoundPlayer("Sounds/CardsPareja.wav");
+        private static readonly SoundPlayer backgroundMusic = new SoundPlayer(@"C:\Desktop\Escritorio 2024\POO\Solitario\Pyramid_Solitaire\Solitario_Piramide\Sounds\Background.wav");
+        private static readonly SoundPlayer cardFlipSound = new SoundPlayer(@"C:\Desktop\Escritorio 2024\POO\Solitario\Pyramid_Solitaire\Solitario_Piramide\Sounds\CardsPareja.wav");
 
         public static void PlayBackgroundMusic()
         {
@@ -18,3 +18,4 @@ namespace Solitario_Piramide.Sound
         }
     }
 }
+

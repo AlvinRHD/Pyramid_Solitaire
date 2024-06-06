@@ -1,6 +1,7 @@
-﻿using Spectre.Console;
+﻿using Solitario_Piramide.UI;
+using Spectre.Console;
 
-namespace PyramidSolitaire.UI
+namespace Solitario_Piramide.UI
 {
     public class Menu : IMenu
     {

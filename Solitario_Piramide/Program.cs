@@ -8,7 +8,7 @@ namespace Solitario_Piramide
     {
         static void Main(string[] args)
         {
-            var gameEngine = new PyramidSolitaire.Game.GameEngine();
+            var gameEngine = new Solitario_Piramide.Game.GameEngine();
             gameEngine.Run();
         }
     }

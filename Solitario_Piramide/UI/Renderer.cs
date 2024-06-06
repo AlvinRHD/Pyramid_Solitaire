@@ -1,7 +1,7 @@
 ﻿using Spectre.Console;
-using PyramidSolitaire.Game;
+using Solitario_Piramide.Game;
 
-namespace PyramidSolitaire.UI
+namespace Solitario_Piramide.UI
 {
     public class Renderer : IRenderer
     {

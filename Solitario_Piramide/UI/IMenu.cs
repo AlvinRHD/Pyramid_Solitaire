@@ -1,4 +1,4 @@
-﻿namespace PyramidSolitaire.UI
+﻿namespace Solitario_Piramide.UI
 {
     public interface IMenu
     {

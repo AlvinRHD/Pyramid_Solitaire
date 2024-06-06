@@ -1,7 +1,7 @@
 ﻿using System;
-using PyramidSolitaire.UI;
-
-
+using System.Media;
+using Solitario_Piramide.Sound;
+using Solitario_Piramide.UI;
 
 namespace Solitario_Piramide.Game
 {
@@ -24,7 +24,7 @@ namespace Solitario_Piramide.Game
 
         public void Run()
         {
-            SoundPlayer.PlayBackgroundMusic();
+            SoundManager.PlayBackgroundMusic();
             menu.ShowWelcomeMenu();
 
             bool playAgain = true;
@@ -45,10 +45,10 @@ namespace Solitario_Piramide.Game
                 renderer.RenderScore(player.Score);
 
                 var move = GetPlayerMove();
-                if (move != null)
+                if (move.HasValue)
                 {
-                    ExecuteMove(move);
-                    SoundPlayer.PlayCardFlipSound();
+                    ExecuteMove(move.Value);  // Aquí desreferenciamos el valor nullable
+                    SoundManager.PlayCardFlipSound();
                 }
 
                 gameWon = CheckWinCondition();
@@ -57,13 +57,14 @@ namespace Solitario_Piramide.Game
             if (gameWon)
             {
                 Console.WriteLine("Congratulations! You've won the game!");
-                player.AddPoints(100); // Example score for winning
+                player.AddPoints(100); // Ejemplo de puntuación por ganar
             }
             else
             {
                 Console.WriteLine("Game over. Better luck next time!");
             }
         }
+
 
         private (Card, Card)? GetPlayerMove()
         {
