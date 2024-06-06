@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PyramidSolitaire.Game
+namespace Solitario_Piramide.Game
 {
     public class Deck
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using Solitario_Piramide.Game;
-using Solitario_Piramide.UI;
 
-namespace PyramidSolitaire
+
+namespace Solitario_Piramide
 {
     class Program
     {

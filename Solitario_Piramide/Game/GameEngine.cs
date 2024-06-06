@@ -1,10 +1,9 @@
 ﻿using System;
 using PyramidSolitaire.UI;
-using PyramidSolitaire.Sounds;
-using Solitario_Piramide.Game;
-using Solitario_Piramide.UI;
 
-namespace PyramidSolitaire.Game
+
+
+namespace Solitario_Piramide.Game
 {
     public class GameEngine
     {
