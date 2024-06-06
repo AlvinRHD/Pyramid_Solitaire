@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace Solitario_Piramide.Game
+namespace PyramidSolitaire.Game
 {
     public class Pyramid
     {
@@ -23,6 +19,35 @@ namespace Solitario_Piramide.Game
                 }
                 Rows.Add(row);
             }
+        }
+
+        public void RemoveCard(Card card)
+        {
+            foreach (var row in Rows)
+            {
+                for (int i = 0; i < row.Length; i++)
+                {
+                    if (row[i] == card)
+                    {
+                        row[i] = null;
+                    }
+                }
+            }
+        }
+
+        public bool AllCardsRemoved()
+        {
+            foreach (var row in Rows)
+            {
+                foreach (var card in row)
+                {
+                    if (card != null)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }

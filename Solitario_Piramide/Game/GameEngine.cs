@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Media;
-using System.Text;
-using System.Threading.Tasks;
+using PyramidSolitaire.UI;
+using PyramidSolitaire.Sounds;
+using Solitario_Piramide.Game;
 using Solitario_Piramide.UI;
 
-namespace Solitario_Piramide.Game
+namespace PyramidSolitaire.Game
 {
     public class GameEngine
     {
@@ -73,7 +71,7 @@ namespace Solitario_Piramide.Game
             Console.WriteLine("Enter the positions of the cards to remove (e.g., 'A1 B2'):");
             var input = Console.ReadLine();
 
-            // Logic to parse input and get the selected cards
+            // Lógica para analizar la entrada y obtener las cartas seleccionadas
             var positions = input?.Split(' ');
             if (positions?.Length == 2)
             {
@@ -91,8 +89,8 @@ namespace Solitario_Piramide.Game
 
         private Card GetCardAtPosition(string position)
         {
-            // Logic to translate a position string (e.g., 'A1') to a Card object
-            // This will depend on how you represent the card positions in the UI
+            // Lógica para traducir una cadena de posición (por ejemplo, 'A1') a un objeto Card
+            // Esto dependerá de cómo representes las posiciones de las cartas en la UI
             return null;
         }
 
@@ -101,18 +99,18 @@ namespace Solitario_Piramide.Game
             var (card1, card2) = move;
             pyramid.RemoveCard(card1);
             pyramid.RemoveCard(card2);
-            player.AddPoints(10); // Example points for a valid move
+            player.AddPoints(10); // Puntos de ejemplo por un movimiento válido
         }
 
         private bool IsGameOver()
         {
-            // Logic to determine if no more valid moves are possible
+            // Lógica para determinar si no hay más movimientos válidos posibles
             return false;
         }
 
         private bool CheckWinCondition()
         {
-            // Logic to check if all cards have been removed
+            // Lógica para verificar si se han eliminado todas las cartas
             return pyramid.AllCardsRemoved();
         }
     }

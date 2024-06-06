@@ -8,9 +8,8 @@ namespace PyramidSolitaire
     {
         static void Main(string[] args)
         {
-            Menu.ShowWelcomeMenu();
-            GameEngine gameEngine = new GameEngine();
-            gameEngine.StartGame();
+            var gameEngine = new PyramidSolitaire.Game.GameEngine();
+            gameEngine.Run();
         }
     }
 }

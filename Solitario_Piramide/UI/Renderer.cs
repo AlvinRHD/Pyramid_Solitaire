@@ -1,25 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Solitario_Piramide.Game;
-using Spectre.Console;
+﻿using Spectre.Console;
+using PyramidSolitaire.Game;
 
-namespace Solitario_Piramide.UI
+namespace PyramidSolitaire.UI
 {
-    public static class Renderer
+    public class Renderer : IRenderer
     {
-        public static void RenderPyramid(Pyramid pyramid)
+        public void RenderPyramid(Pyramid pyramid)
         {
             foreach (var row in pyramid.Rows)
             {
                 foreach (var card in row)
                 {
-                    AnsiConsole.Write(new Markup($"[bold] {card.Value}{card.Suit[0]} [/]").Centered());
+                    if (card != null)
+                    {
+                        if (card.IsFaceUp)
+                        {
+                            AnsiConsole.Write(new Markup($"[bold] {card.Value}{card.Suit[0]} [/]").Centered());
+                        }
+                        else
+                        {
+                            AnsiConsole.Write(new Markup($"[bold] XX [/]").Centered());
+                        }
+                    }
+                    else
+                    {
+                        AnsiConsole.Write(new Markup("[bold] -- [/]").Centered());
+                    }
                 }
                 AnsiConsole.WriteLine();
             }
+        }
+
+        public void RenderScore(int score)
+        {
+            AnsiConsole.WriteLine($"Score: {score}");
         }
     }
 }
