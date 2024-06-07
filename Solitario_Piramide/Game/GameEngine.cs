@@ -1,8 +1,8 @@
-﻿using Solitario_Piramide.Sound;
+﻿using Solitario_Piramide.Interfaces;
+using Solitario_Piramide.Sound;
 using Solitario_Piramide.UI;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace Solitario_Piramide.Game.GameEngine
 {
@@ -31,16 +31,19 @@ namespace Solitario_Piramide.Game.GameEngine
 
         public void StartGame()
         {
+            SoundManager soundManager = new SoundManager();
+            soundManager.PlayBackgroundMusic();
+
             bool gameWon = false;
             while (!gameWon && !IsGameOver())
             {
-                renderer.Render(pyramid, player.Score);
+                renderer.RenderPyramid(pyramid, player.Score);
 
                 var move = GetPlayerMove();
                 if (move != null)
                 {
-                    ExecuteMove(move);
-                    SoundManager.PlayCardFlipSound();
+                    ExecuteMove(move.Value);
+                    soundManager.PlayCardFlipSound();
                 }
 
                 gameWon = CheckWinCondition();
@@ -57,27 +60,63 @@ namespace Solitario_Piramide.Game.GameEngine
             }
         }
 
+        
+
         private bool IsGameOver()
         {
-            // Logic to determine if the game is over
-            return false;
+            // Ejemplo de lógica de fin de juego (puedes adaptarlo según tus reglas)
+            return pyramid.Rows.All(row => row.All(card => card == null));
         }
 
-        private (Card, Card)? GetPlayerMove()
+        private (ICard, ICard)? GetPlayerMove()
         {
-            // Logic to get the player's move
-            return null;
+            // Aquí puedes pedir al jugador que seleccione dos cartas
+            Console.WriteLine("Selecciona la primera carta (fila, columna): ");
+            string[] firstInput = Console.ReadLine().Split(',');
+            int firstRow = int.Parse(firstInput[0]);
+            int firstCol = int.Parse(firstInput[1]);
+
+            Console.WriteLine("Selecciona la segunda carta (fila, columna): ");
+            string[] secondInput = Console.ReadLine().Split(',');
+            int secondRow = int.Parse(secondInput[0]);
+            int secondCol = int.Parse(secondInput[1]);
+
+            var firstCard = pyramid.GetCardAtPosition(firstRow, firstCol);
+            var secondCard = pyramid.GetCardAtPosition(secondRow, secondCol);
+
+            return (firstCard, secondCard);
         }
 
-        private void ExecuteMove((Card, Card) move)
+        private void ExecuteMove((ICard, ICard) move)
         {
-            // Logic to execute the player's move
+            // Ejemplo de lógica para ejecutar el movimiento del jugador
+            var (firstCard, secondCard) = move;
+            if (firstCard != null && secondCard != null && firstCard.Value + secondCard.Value == 13)
+            {
+                RemoveCard(firstCard);
+                RemoveCard(secondCard);
+                player.AddPoints(10); // Añadir puntos según tus reglas
+            }
         }
 
         private bool CheckWinCondition()
         {
-            // Logic to check if the player has won
-            return false;
+            // Verificar si todas las cartas han sido eliminadas
+            return pyramid.Rows.All(row => row.All(card => card == null));
         }
+
+        private void RemoveCard(ICard card)
+        {
+            // Eliminar la carta de la pirámide
+            foreach (var row in pyramid.Rows)
+            {
+                if (row.Contains(card))
+                {
+                    row[row.IndexOf(card)] = null;
+                    return;
+                }
+            }
+        }
+
     }
 }

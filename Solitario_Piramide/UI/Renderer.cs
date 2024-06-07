@@ -1,6 +1,6 @@
 ﻿using Spectre.Console;
 using Solitario_Piramide.Game;
-using Solitario_Piramide.Inferfaces;
+using Solitario_Piramide.Interfaces;
 
 namespace Solitario_Piramide.UI
 {
@@ -12,17 +12,17 @@ namespace Solitario_Piramide.UI
 │                               SOLITARIO                                  │ 
 │                                                                          │ 
 ├──────────────────────────────────────────────────────────────────────────┤ 
-│                                [  ]                                      │ 
-│                              [  ][  ]                                    │ 
-│                            [  ][  ][  ]                                  │ 
-│                          [  ][  ][  ][  ]                                │ 
-│                         [  ][  ][  ][  ][  ]                             │ 
-│                        [  ][  ][  ][  ][  ][  ]                          │ 
-│                      [  ][  ][  ][  ][  ][  ][  ]                        │ 
 │                                                                          │ 
 │                                                                          │ 
 │                                                                          │ 
-│                     ( D )  ( C )                 ( B )                   │ 
+│                                                                          │ 
+│                                                                          │ 
+│                                                                          │ 
+│                                                                          │ 
+│                                                                          │ 
+│                                                                          │ 
+│                                                                          │ 
+│                                                                          │ 
 │                                                                          │ 
 │                                                                          │ 
 ├──────────────────────────────────────────────────────────────────────────┤ 
@@ -43,7 +43,7 @@ namespace Solitario_Piramide.UI
 │   se puede tomar esa carta sola.                                         │ 
 └──────────────────────────────────────────────────────────────────────────┘";
 
-        public void RenderPyramid(IPyramid pyramid)
+        public void RenderPyramid(IPyramid pyramid, int score)
         {
             string[] lines = background.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
@@ -65,6 +65,8 @@ namespace Solitario_Piramide.UI
             {
                 Console.WriteLine(line);
             }
+
+            Console.WriteLine($"Score: {score}");
         }
 
         private static string GetCardString(ICard card)

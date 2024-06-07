@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Solitario_Piramide.Inferfaces
+namespace Solitario_Piramide.Interfaces
 {
     public interface ICard
     {
