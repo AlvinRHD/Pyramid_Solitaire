@@ -4,6 +4,7 @@ using Solitario_Piramide.UI;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Solitario_Piramide.Game.GameEngine
 {
@@ -13,7 +14,7 @@ namespace Solitario_Piramide.Game.GameEngine
         private Renderer renderer;
         private Player player;
         private Deck deck;
-        private (int, int)? additionalCard;
+        private ICard? additionalCard;
 
         public GameEngine()
         {
@@ -56,13 +57,16 @@ namespace Solitario_Piramide.Game.GameEngine
             if (gameWon)
             {
                 AnsiConsole.Markup("[bold green]Congratulations! You've won the game![/]");
-                player.AddPoints(100); // Example score for winning
+                player.AddPoints(100); // Ejemplo de puntaje para ganar
             }
             else
             {
                 AnsiConsole.Markup("[bold red]Game over. Better luck next time![/]");
             }
         }
+
+
+
 
         private bool IsGameOver()
         {
@@ -200,6 +204,8 @@ namespace Solitario_Piramide.Game.GameEngine
             if (firstCard != null && secondCard != null && firstCard.Value + secondCard.Value == 13)
             {
                 player.AddPoints(10); // Puntaje según tus reglas
+                RemoveCard(firstCard);
+                RemoveCard(secondCard);
             }
         }
 
@@ -230,5 +236,5 @@ namespace Solitario_Piramide.Game.GameEngine
             additionalCard = null;
             InitializePyramid();
         }
-    } 
-}  
+    }
+}

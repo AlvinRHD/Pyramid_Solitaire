@@ -1,7 +1,6 @@
 ﻿using Spectre.Console;
 using Solitario_Piramide.Game;
 using Solitario_Piramide.Interfaces;
-using Solitario_Piramide.Inferfaces;
 
 namespace Solitario_Piramide.UI
 {
@@ -46,6 +45,9 @@ namespace Solitario_Piramide.UI
 │   el rey cuenta como 13, por lo tanto          Rey (K): 13 puntos        │ 
 │   se puede tomar esa carta sola.                                         │ 
 └──────────────────────────────────────────────────────────────────────────┘";
+
+
+
 
         public void RenderPyramid(IPyramid pyramid, int score, (int, int)? selectedCardPosition)
         {

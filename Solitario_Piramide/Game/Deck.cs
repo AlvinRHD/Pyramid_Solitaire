@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Solitario_Piramide.Inferfaces;
+using Solitario_Piramide.Interfaces;
 
 namespace Solitario_Piramide.Game
 {

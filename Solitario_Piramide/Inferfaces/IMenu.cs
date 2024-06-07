@@ -1,4 +1,4 @@
-﻿namespace Solitario_Piramide.Inferfaces
+﻿namespace Solitario_Piramide.Interfaces
 {
     public interface IMenu
     {

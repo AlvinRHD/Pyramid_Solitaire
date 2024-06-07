@@ -1,4 +1,5 @@
-﻿using System.Media;
+﻿using Solitario_Piramide.Interfaces;
+using System.Media;
 using static Solitario_Piramide.Sound.SoundManager;
 
 namespace Solitario_Piramide.Sound
@@ -6,8 +7,8 @@ namespace Solitario_Piramide.Sound
 
     public class SoundManager : ISoundManager, IDisposable
     {
-        private static readonly SoundPlayer backgroundMusic = new SoundPlayer(@"C:\Desktop\Escritorio 2024\POO\Solitario\Pyramid_Solitaire\Solitario_Piramide\Sounds\1.wav");
-        private static readonly SoundPlayer cardFlipSound = new SoundPlayer(@"C:\Desktop\Escritorio 2024\POO\Solitario\Pyramid_Solitaire\Solitario_Piramide\Sounds\2.wav");
+        private static readonly SoundPlayer backgroundMusic = new SoundPlayer(@"C:\Users\ezequ\OneDrive\Escritorio\Pyramid_Solitaire\Solitario_Piramide\Sounds\1.wav");
+        private static readonly SoundPlayer cardFlipSound = new SoundPlayer(@"C:\Users\ezequ\OneDrive\Escritorio\Pyramid_Solitaire\Solitario_Piramide\Sounds\2.wav");
 
         public void PlayBackgroundMusic()
         {

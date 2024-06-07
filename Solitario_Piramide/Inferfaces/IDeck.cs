@@ -1,13 +1,14 @@
 ﻿using Solitario_Piramide.Game;
+using System.Collections.Generic;
 
-namespace Solitario_Piramide.Inferfaces
+namespace Solitario_Piramide.Interfaces
 {
     public interface IDeck
     {
         Card DrawCard();
         List<Card> DrawCards(int count);
         void Shuffle();
-        void ResetDeck(); // Nuevo método para reiniciar el mazo
-        int CardsRemaining { get; } // Propiedad para obtener el número de cartas restantes
+        void ResetDeck();
+        int CardsRemaining { get; }
     }
 }

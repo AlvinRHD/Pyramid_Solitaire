@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Solitario_Piramide.Inferfaces;
-using static System.Formats.Asn1.AsnWriter;
+﻿using Solitario_Piramide.Interfaces;
 
 namespace Solitario_Piramide
 {
@@ -21,6 +15,7 @@ namespace Solitario_Piramide
         {
             Score += points;
         }
+
         public void ResetScore()
         {
             Score = 0;

@@ -1,5 +1,6 @@
-﻿using Solitario_Piramide.Game.GameEngine;
-using Solitario_Piramide.Inferfaces;
+﻿using Solitario_Piramide.Game;
+using Solitario_Piramide.Game.GameEngine;
+using Solitario_Piramide.Interfaces;
 using Spectre.Console;
 using System;
 

@@ -1,10 +1,7 @@
 ﻿using System;
-using Solitario_Piramide.Game;
-using Solitario_Piramide.Inferfaces;
 using Solitario_Piramide.Interfaces;
 using Solitario_Piramide.Sound;
 using Solitario_Piramide.UI;
-
 
 namespace Solitario_Piramide
 {

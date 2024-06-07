@@ -1,6 +1,6 @@
 ﻿using Solitario_Piramide.Interfaces;
 
-namespace Solitario_Piramide.UI
+namespace Solitario_Piramide.Interfaces
 {
     public interface IRenderer
     {
