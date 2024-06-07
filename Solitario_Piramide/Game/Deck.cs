@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Solitario_Piramide.Inferfaces;
 
 namespace Solitario_Piramide.Game
 {
-    public class Deck
+    public class Deck : IDeck
     {
         private List<Card> cards;
 
@@ -55,6 +56,7 @@ namespace Solitario_Piramide.Game
 
         public List<Card> DrawCards(int count)
         {
+            if (count > cards.Count) throw new InvalidOperationException("Not enough cards to draw");
             List<Card> drawnCards = new List<Card>();
             for (int i = 0; i < count; i++)
             {
@@ -62,5 +64,13 @@ namespace Solitario_Piramide.Game
             }
             return drawnCards;
         }
+
+        public void ResetDeck()
+        {
+            cards.Clear();
+            InitializeDeck();
+        }
+
+        public int CardsRemaining => cards.Count;
     }
 }

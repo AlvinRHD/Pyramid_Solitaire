@@ -9,6 +9,8 @@ namespace Solitario_Piramide.Game
 
         public Card(int value, string suit)
         {
+            if (value < 1 || value > 13) throw new ArgumentException("Invalid card value");
+            if (string.IsNullOrWhiteSpace(suit)) throw new ArgumentException("Invalid card suit");
             Value = value;
             Suit = suit;
         }

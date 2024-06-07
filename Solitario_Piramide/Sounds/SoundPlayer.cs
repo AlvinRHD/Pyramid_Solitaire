@@ -4,19 +4,39 @@ using static Solitario_Piramide.Sound.SoundManager;
 namespace Solitario_Piramide.Sound
 {
 
-    public class SoundManager : ISoundManager
+    public class SoundManager : ISoundManager, IDisposable
     {
-        private static readonly SoundPlayer backgroundMusic = new SoundPlayer(@"C:\Users\ezequ\OneDrive\Escritorio\Pyramid_Solitaire\Solitario_Piramide\Sounds\1.wav");
-        private static readonly SoundPlayer cardFlipSound = new SoundPlayer(@"C:\Users\ezequ\OneDrive\Escritorio\Pyramid_Solitaire\Solitario_Piramide\Sounds\2.wav");
+        private static readonly SoundPlayer backgroundMusic = new SoundPlayer(@"C:\Desktop\Escritorio 2024\POO\Solitario\Pyramid_Solitaire\Solitario_Piramide\Sounds\1.wav");
+        private static readonly SoundPlayer cardFlipSound = new SoundPlayer(@"C:\Desktop\Escritorio 2024\POO\Solitario\Pyramid_Solitaire\Solitario_Piramide\Sounds\2.wav");
 
         public void PlayBackgroundMusic()
         {
-            backgroundMusic.PlayLooping();
+            try
+            {
+                backgroundMusic.PlayLooping();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al reproducir música de fondo: " + ex.Message);
+            }
         }
 
         public void PlayCardFlipSound()
         {
-            cardFlipSound.Play();
+            try
+            {
+                cardFlipSound.Play();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al reproducir el sonido de volteo de carta: " + ex.Message);
+            }
+        }
+
+        public void Dispose()
+        {
+            backgroundMusic.Dispose();
+            cardFlipSound.Dispose();
         }
     }
 }

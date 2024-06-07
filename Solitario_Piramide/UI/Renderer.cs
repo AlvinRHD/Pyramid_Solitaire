@@ -1,6 +1,7 @@
 ﻿using Spectre.Console;
 using Solitario_Piramide.Game;
 using Solitario_Piramide.Interfaces;
+using Solitario_Piramide.Inferfaces;
 
 namespace Solitario_Piramide.UI
 {
@@ -25,6 +26,9 @@ namespace Solitario_Piramide.UI
 │                                                                          │ 
 │                                                                          │ 
 │                                                                          │ 
+│                                                                          │
+│              ( D )                                 ( B )                 │ 
+│                                                                          │ 
 ├──────────────────────────────────────────────────────────────────────────┤ 
 │                                                                          │ 
 │                             SOLITARIO PIRAMIDE                           │ 
@@ -43,7 +47,7 @@ namespace Solitario_Piramide.UI
 │   se puede tomar esa carta sola.                                         │ 
 └──────────────────────────────────────────────────────────────────────────┘";
 
-        public void RenderPyramid(IPyramid pyramid, int score)
+        public void RenderPyramid(IPyramid pyramid, int score, (int, int)? selectedCardPosition)
         {
             string[] lines = background.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
@@ -54,10 +58,19 @@ namespace Solitario_Piramide.UI
             {
                 for (int j = 0; j < pyramid.Rows[i].Count; j++)
                 {
-                    string cardString = pyramid.Rows[i][j] != null ? GetCardString(pyramid.Rows[i][j]) : "  ";
+                    string cardString = GetCardString(pyramid.Rows[i][j]);
                     int colOffset = (7 - i) + j * 6;
                     lines[startRow + i] = lines[startRow + i].Remove(startCol + colOffset, 2).Insert(startCol + colOffset, cardString);
                 }
+            }
+
+            // Highlight the selected card if it's provided
+            if (selectedCardPosition != null)
+            {
+                int row = selectedCardPosition.Value.Item1;
+                int col = selectedCardPosition.Value.Item2;
+                int colOffset = (7 - row) + col * 6;
+                lines[startRow + row] = lines[startRow + row].Remove(startCol + colOffset, 2).Insert(startCol + colOffset, "[bold red]XX[/]");
             }
 
             Console.Clear();
@@ -78,26 +91,26 @@ namespace Solitario_Piramide.UI
 
         private static string GetValueString(int value)
         {
-            switch (value)
+            return value switch
             {
-                case 1: return "A";
-                case 11: return "J";
-                case 12: return "Q";
-                case 13: return "K";
-                default: return value.ToString();
-            }
+                1 => "A",
+                11 => "J",
+                12 => "Q",
+                13 => "K",
+                _ => value.ToString()
+            };
         }
 
         private static string GetSuitString(string suit)
         {
-            switch (suit)
+            return suit switch
             {
-                case "Hearts": return "♥";
-                case "Diamonds": return "♦";
-                case "Clubs": return "♣";
-                case "Spades": return "♠";
-                default: return "?";
-            }
+                "Hearts" => "♥",
+                "Diamonds" => "♦",
+                "Clubs" => "♣",
+                "Spades" => "♠",
+                _ => "?"
+            };
         }
     }
 }

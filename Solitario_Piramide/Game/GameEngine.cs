@@ -1,6 +1,7 @@
 ﻿using Solitario_Piramide.Interfaces;
 using Solitario_Piramide.Sound;
 using Solitario_Piramide.UI;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 
@@ -12,6 +13,7 @@ namespace Solitario_Piramide.Game.GameEngine
         private Renderer renderer;
         private Player player;
         private Deck deck;
+        private (int, int)? additionalCard;
 
         public GameEngine()
         {
@@ -19,6 +21,7 @@ namespace Solitario_Piramide.Game.GameEngine
             renderer = new Renderer();
             player = new Player();
             deck = new Deck();
+            additionalCard = null;
 
             InitializePyramid();
         }
@@ -35,9 +38,10 @@ namespace Solitario_Piramide.Game.GameEngine
             soundManager.PlayBackgroundMusic();
 
             bool gameWon = false;
+
             while (!gameWon && !IsGameOver())
             {
-                renderer.RenderPyramid(pyramid, player.Score);
+                renderer.RenderPyramid(pyramid, player.Score, additionalCard);
 
                 var move = GetPlayerMove();
                 if (move != null)
@@ -51,51 +55,151 @@ namespace Solitario_Piramide.Game.GameEngine
 
             if (gameWon)
             {
-                Console.WriteLine("Congratulations! You've won the game!");
+                AnsiConsole.Markup("[bold green]Congratulations! You've won the game![/]");
                 player.AddPoints(100); // Example score for winning
             }
             else
             {
-                Console.WriteLine("Game over. Better luck next time!");
+                AnsiConsole.Markup("[bold red]Game over. Better luck next time![/]");
             }
         }
 
-        
-
         private bool IsGameOver()
         {
-            // Ejemplo de lógica de fin de juego (puedes adaptarlo según tus reglas)
-            return pyramid.Rows.All(row => row.All(card => card == null));
+            // Check if all cards have been removed
+            bool allCardsRemoved = pyramid.Rows.All(row => row.All(card => card == null));
+            if (allCardsRemoved)
+            {
+                return true;
+            }
+
+            // Check if there are possible moves
+            for (int i = 0; i < pyramid.Rows.Count; i++)
+            {
+                for (int j = 0; j < pyramid.Rows[i].Count; j++)
+                {
+                    var card1 = pyramid.Rows[i][j];
+                    if (card1 == null) continue;
+                    for (int k = 0; k < pyramid.Rows.Count; k++)
+                    {
+                        for (int l = 0; l < pyramid.Rows[k].Count; l++)
+                        {
+                            if (i == k && j == l) continue;
+                            var card2 = pyramid.Rows[k][l];
+                            if (card2 != null && card1.Value + card2.Value == 13)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Check if there are possible moves with additional cards
+            if (additionalCard != null)
+            {
+                for (int i = 0; i < pyramid.Rows.Count; i++)
+                {
+                    for (int j = 0; j < pyramid.Rows[i].Count; j++)
+                    {
+                        var pyramidCard = pyramid.Rows[i][j];
+                        if (pyramidCard != null && additionalCard.Value + pyramidCard.Value == 13)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            // If no possible moves and no cards left in the deck
+            if (deck.CardsRemaining == 0 && additionalCard == null)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private (ICard, ICard)? GetPlayerMove()
         {
-            // Aquí puedes pedir al jugador que seleccione dos cartas
-            Console.WriteLine("Selecciona la primera carta (fila, columna): ");
-            string[] firstInput = Console.ReadLine().Split(',');
-            int firstRow = int.Parse(firstInput[0]);
-            int firstCol = int.Parse(firstInput[1]);
+            try
+            {
+                var options = new List<string> { "draw" };
+                for (int i = 0; i < pyramid.Rows.Count; i++)
+                {
+                    for (int j = 0; j < pyramid.Rows[i].Count; j++)
+                    {
+                        if (pyramid.Rows[i][j] != null)
+                        {
+                            options.Add($"{i},{j}");
+                        }
+                    }
+                }
 
-            Console.WriteLine("Selecciona la segunda carta (fila, columna): ");
-            string[] secondInput = Console.ReadLine().Split(',');
-            int secondRow = int.Parse(secondInput[0]);
-            int secondCol = int.Parse(secondInput[1]);
+                var firstInput = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                        .Title("Select the first card (row, column) or [green]draw[/] to draw a card from the deck:")
+                        .AddChoices(options));
 
-            var firstCard = pyramid.GetCardAtPosition(firstRow, firstCol);
-            var secondCard = pyramid.GetCardAtPosition(secondRow, secondCol);
+                if (firstInput == "draw")
+                {
+                    if (deck.CardsRemaining > 0)
+                    {
+                        additionalCard = deck.DrawCard();
+                        return null;
+                    }
+                    else
+                    {
+                        AnsiConsole.Markup("[red]No cards left in the deck.[/]");
+                        return null;
+                    }
+                }
 
-            return (firstCard, secondCard);
+                var firstCoords = firstInput.Split(',');
+                int firstRow = int.Parse(firstCoords[0]);
+                int firstCol = int.Parse(firstCoords[1]);
+
+                var secondInput = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                        .Title("Select the second card (row, column) or [green]draw[/] to draw a card from the deck:")
+                        .AddChoices(options));
+
+                if (secondInput == "draw")
+                {
+                    if (deck.CardsRemaining > 0)
+                    {
+                        additionalCard = deck.DrawCard();
+                        return null;
+                    }
+                    else
+                    {
+                        AnsiConsole.Markup("[red]No cards left in the deck.[/]");
+                        return null;
+                    }
+                }
+
+                var secondCoords = secondInput.Split(',');
+                int secondRow = int.Parse(secondCoords[0]);
+                int secondCol = int.Parse(secondCoords[1]);
+
+                var firstCard = pyramid.GetCardAtPosition(firstRow, firstCol);
+                var secondCard = pyramid.GetCardAtPosition(secondRow, secondCol);
+
+                return (firstCard, secondCard);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Markup($"[red]{ex.Message}[/]");
+                return null;
+            }
         }
 
         private void ExecuteMove((ICard, ICard) move)
         {
-            // Ejemplo de lógica para ejecutar el movimiento del jugador
             var (firstCard, secondCard) = move;
             if (firstCard != null && secondCard != null && firstCard.Value + secondCard.Value == 13)
             {
-                RemoveCard(firstCard);
-                RemoveCard(secondCard);
-                player.AddPoints(10); // Añadir puntos según tus reglas
+                player.AddPoints(10); // Puntaje según tus reglas
             }
         }
 
@@ -113,10 +217,18 @@ namespace Solitario_Piramide.Game.GameEngine
                 if (row.Contains(card))
                 {
                     row[row.IndexOf(card)] = null;
-                    return;
+                    break;
                 }
             }
         }
 
-    }
-}
+        public void RestartGame()
+        {
+            pyramid = new Pyramid();
+            deck.ResetDeck();
+            player.ResetScore();
+            additionalCard = null;
+            InitializePyramid();
+        }
+    } 
+}  
