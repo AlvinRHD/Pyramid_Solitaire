@@ -1,18 +1,19 @@
-﻿using Solitario_Piramide.Game;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Solitario_Piramide.Game
 {
     public class Deck
     {
-        private Stack<Card> cards;
+        private List<Card> cards;
 
         public Deck()
         {
-            cards = new Stack<Card>();
+            cards = new List<Card>();
             InitializeDeck();
-            Shuffle();
         }
 
         private void InitializeDeck()
@@ -20,30 +21,46 @@ namespace Solitario_Piramide.Game
             string[] suits = { "Hearts", "Diamonds", "Clubs", "Spades" };
             for (int i = 1; i <= 13; i++)
             {
-                foreach (string suit in suits)
+                foreach (var suit in suits)
                 {
-                    cards.Push(new Card(i, suit));
+                    cards.Add(new Card(i, suit));
                 }
             }
         }
 
-        private void Shuffle()
+        public void Shuffle()
         {
-            var rnd = new Random();
-            var shuffledCards = new List<Card>(cards);
-            for (int i = shuffledCards.Count - 1; i > 0; i--)
+            Random rng = new Random();
+            int n = cards.Count;
+            while (n > 1)
             {
-                int swapIndex = rnd.Next(i + 1);
-                Card temp = shuffledCards[i];
-                shuffledCards[i] = shuffledCards[swapIndex];
-                shuffledCards[swapIndex] = temp;
+                n--;
+                int k = rng.Next(n + 1);
+                Card value = cards[k];
+                cards[k] = cards[n];
+                cards[n] = value;
             }
-            cards = new Stack<Card>(shuffledCards);
         }
 
         public Card DrawCard()
         {
-            return cards.Pop();
+            if (cards.Count > 0)
+            {
+                Card card = cards[0];
+                cards.RemoveAt(0);
+                return card;
+            }
+            throw new InvalidOperationException("The deck is empty");
+        }
+
+        public List<Card> DrawCards(int count)
+        {
+            List<Card> drawnCards = new List<Card>();
+            for (int i = 0; i < count; i++)
+            {
+                drawnCards.Add(DrawCard());
+            }
+            return drawnCards;
         }
     }
 }

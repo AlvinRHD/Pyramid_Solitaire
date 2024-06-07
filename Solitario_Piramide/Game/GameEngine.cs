@@ -1,54 +1,46 @@
-﻿using System;
-using System.Media;
-using Solitario_Piramide.Sound;
+﻿using Solitario_Piramide.Sound;
 using Solitario_Piramide.UI;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 
-namespace Solitario_Piramide.Game
+namespace Solitario_Piramide.Game.GameEngine
 {
     public class GameEngine
     {
-        private readonly Deck deck;
-        private readonly Pyramid pyramid;
-        private readonly Player player;
-        private readonly IRenderer renderer;
-        private readonly IMenu menu;
+        private Pyramid pyramid;
+        private Renderer renderer;
+        private Player player;
+        private Deck deck;
 
         public GameEngine()
         {
-            deck = new Deck();
-            pyramid = new Pyramid(deck);
-            player = new Player();
+            pyramid = new Pyramid();
             renderer = new Renderer();
-            menu = new Menu();
+            player = new Player();
+            deck = new Deck();
+
+            InitializePyramid();
         }
 
-        public void Run()
+        private void InitializePyramid()
         {
-            //SoundManager.PlayBackgroundMusic();
-            menu.ShowWelcomeMenu();
-
-            bool playAgain = true;
-            while (playAgain)
-            {
-                StartGame();
-                Console.WriteLine("Do you want to play again? (y/n)");
-                playAgain = Console.ReadLine()?.ToLower() == "y";
-            }
+            deck.Shuffle();
+            pyramid.SetUpPyramid(deck);
         }
 
-        private void StartGame()
+        public void StartGame()
         {
             bool gameWon = false;
             while (!gameWon && !IsGameOver())
             {
-                renderer.RenderPyramid(pyramid);
-                renderer.RenderScore(player.Score);
+                renderer.Render(pyramid, player.Score);
 
                 var move = GetPlayerMove();
-                if (move.HasValue)
+                if (move != null)
                 {
-                    ExecuteMove(move.Value);  // Aquí desreferenciamos el valor nullable
-                    //SoundManager.PlayCardFlipSound();
+                    ExecuteMove(move);
+                    SoundManager.PlayCardFlipSound();
                 }
 
                 gameWon = CheckWinCondition();
@@ -57,7 +49,7 @@ namespace Solitario_Piramide.Game
             if (gameWon)
             {
                 Console.WriteLine("Congratulations! You've won the game!");
-                player.AddPoints(100); // Ejemplo de puntuación por ganar
+                player.AddPoints(100); // Example score for winning
             }
             else
             {
@@ -65,53 +57,27 @@ namespace Solitario_Piramide.Game
             }
         }
 
+        private bool IsGameOver()
+        {
+            // Logic to determine if the game is over
+            return false;
+        }
 
         private (Card, Card)? GetPlayerMove()
         {
-            Console.WriteLine("Enter the positions of the cards to remove (e.g., 'A1 B2'):");
-            var input = Console.ReadLine();
-
-            // Lógica para analizar la entrada y obtener las cartas seleccionadas
-            var positions = input?.Split(' ');
-            if (positions?.Length == 2)
-            {
-                var card1 = GetCardAtPosition(positions[0]);
-                var card2 = GetCardAtPosition(positions[1]);
-
-                if (card1 != null && card2 != null && card1.Value + card2.Value == 13)
-                {
-                    return (card1, card2);
-                }
-            }
-
-            return null;
-        }
-
-        private Card GetCardAtPosition(string position)
-        {
-            // Lógica para traducir una cadena de posición (por ejemplo, 'A1') a un objeto Card
-            // Esto dependerá de cómo representes las posiciones de las cartas en la UI
+            // Logic to get the player's move
             return null;
         }
 
         private void ExecuteMove((Card, Card) move)
         {
-            var (card1, card2) = move;
-            pyramid.RemoveCard(card1);
-            pyramid.RemoveCard(card2);
-            player.AddPoints(10); // Puntos de ejemplo por un movimiento válido
-        }
-
-        private bool IsGameOver()
-        {
-            // Lógica para determinar si no hay más movimientos válidos posibles
-            return false;
+            // Logic to execute the player's move
         }
 
         private bool CheckWinCondition()
         {
-            // Lógica para verificar si se han eliminado todas las cartas
-            return pyramid.AllCardsRemoved();
+            // Logic to check if the player has won
+            return false;
         }
     }
 }

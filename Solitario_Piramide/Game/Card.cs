@@ -1,16 +1,16 @@
-﻿namespace Solitario_Piramide.Game
+﻿using Solitario_Piramide.Inferfaces;
+
+namespace Solitario_Piramide.Game
 {
-    public class Card
+    public class Card : ICard
     {
-        public int Value { get; }
-        public string Suit { get; }
-        public bool IsFaceUp { get; set; }
+        public int Value { get; set; }
+        public string Suit { get; set; }
 
         public Card(int value, string suit)
         {
             Value = value;
             Suit = suit;
-            IsFaceUp = false;
         }
     }
 }
