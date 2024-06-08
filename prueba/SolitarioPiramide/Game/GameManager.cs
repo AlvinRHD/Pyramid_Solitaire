@@ -3,9 +3,6 @@ using SolitarioPiramide.UI;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SolitarioPiramide.Game
 {
@@ -59,18 +56,57 @@ namespace SolitarioPiramide.Game
         private static void PlayGame()
         {
             bool gameRunning = true;
+            Card stockCard = null;
 
             while (gameRunning)
             {
-                Console.Clear();
-                DisplayGameBoard();
-                DisplayCards();
+                DisplayGameBoard(stockCard); // Mostrar el tablero actual con la carta del stock
 
-                var input = AnsiConsole.Ask<string>("Seleccione dos cartas que sumen 13 (formato: fila1,col1 fila2,col2) o 's' para sacar una carta del stock:");
+                var input = AnsiConsole.Ask<string>("Seleccione dos cartas que sumen 13 (formato: fila1,col1 fila2,col2), 's' para sacar una carta del stock, o 'w' para usar la carta del waste:");
 
                 if (input.ToLower() == "s")
                 {
                     DrawFromStock();
+                    if (waste.Count > 0)
+                    {
+                        stockCard = waste[waste.Count - 1]; // Obtener la última carta del waste
+                    }
+                }
+                else if (input.ToLower() == "w")
+                {
+                    if (stockCard != null)
+                    {
+                        AnsiConsole.Markup($"[bold yellow]Estás usando la carta del stock: {EscapeMarkup(stockCard.ToString())}[/]\n");
+                        var selection = AnsiConsole.Ask<string>("Seleccione una carta en la pirámide que sume 13 con la carta del stock (formato: fila,col):");
+                        var card = selection.Split(',');
+
+                        if (card.Length == 2 &&
+                            int.TryParse(card[0], out int row) &&
+                            int.TryParse(card[1], out int col) &&
+                            IsWithinBounds(row, col))
+                        {
+                            if (pyramid[row][col] != null && pyramid[row][col].IsFaceUp &&
+                                stockCard.Value + pyramid[row][col].Value == 13)
+                            {
+                                UpdateBoard(row, col); // Llamada a la versión de dos parámetros
+                                waste.Remove(stockCard);
+                                stockCard = null;
+                                PlayActionSound();
+                            }
+                            else
+                            {
+                                AnsiConsole.Markup("[bold red]Selección inválida, intenta de nuevo.[/]\n");
+                            }
+                        }
+                        else
+                        {
+                            AnsiConsole.Markup("[bold red]Entrada no válida, intenta de nuevo.[/]\n");
+                        }
+                    }
+                    else
+                    {
+                        AnsiConsole.Markup("[bold red]No hay carta en el stock para usar.[/]\n");
+                    }
                 }
                 else
                 {
@@ -89,7 +125,7 @@ namespace SolitarioPiramide.Game
                         {
                             if (IsValidSelection(row1, col1, row2, col2))
                             {
-                                UpdateBoard(row1, col1, row2, col2);
+                                UpdateBoard(row1, col1, row2, col2); // Llamada a la versión de cuatro parámetros
                                 PlayActionSound();
                             }
                             else
@@ -97,6 +133,14 @@ namespace SolitarioPiramide.Game
                                 AnsiConsole.Markup("[bold red]Selección inválida, intenta de nuevo.[/]\n");
                             }
                         }
+                        else
+                        {
+                            AnsiConsole.Markup("[bold red]Entrada no válida, intenta de nuevo.[/]\n");
+                        }
+                    }
+                    else
+                    {
+                        AnsiConsole.Markup("[bold red]Entrada no válida, intenta de nuevo.[/]\n");
                     }
                 }
 
@@ -113,7 +157,7 @@ namespace SolitarioPiramide.Game
                 Card drawnCard = stock[0];
                 stock.RemoveAt(0);
                 waste.Add(drawnCard);
-                AnsiConsole.Markup($"[bold yellow]Sacaste una carta del stock: {drawnCard}[/]\n");
+                AnsiConsole.Markup($"[bold yellow]Sacaste una carta del stock: {EscapeMarkup(drawnCard.ToString())}[/]\n");
             }
             else
             {
@@ -123,13 +167,25 @@ namespace SolitarioPiramide.Game
 
         private static bool IsValidSelection(int row1, int col1, int row2, int col2)
         {
+            if (!IsWithinBounds(row1, col1) || !IsWithinBounds(row2, col2))
+            {
+                return false;
+            }
+
             Card card1 = pyramid[row1][col1];
             Card card2 = pyramid[row2][col2];
 
-            if (!card1.IsFaceUp || !card2.IsFaceUp || card1 == card2)
+            if (card1 == null || card2 == null || !card1.IsFaceUp || !card2.IsFaceUp || card1 == card2)
+            {
                 return false;
+            }
 
             return (card1.Value + card2.Value == 13);
+        }
+
+        private static bool IsWithinBounds(int row, int col)
+        {
+            return row >= 0 && row < 7 && col >= 0 && col <= row;
         }
 
         private static void UpdateBoard(int row1, int col1, int row2, int col2)
@@ -148,6 +204,26 @@ namespace SolitarioPiramide.Game
                             (row < 6 && pyramid[row + 1][col] == null && pyramid[row + 1][col + 1] == null))
                         {
                             pyramid[row][col].IsFaceUp = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void UpdateBoard(int row, int col)
+        {
+            pyramid[row][col] = null;
+            score += 10;
+
+            for (int r = 0; r < 7; r++)
+            {
+                for (int c = 0; c < r + 1; c++)
+                {
+                    if (pyramid[r][c] != null && !pyramid[r][c].IsFaceUp)
+                    {
+                        if ((r == 6) || (r < 6 && pyramid[r + 1][c] == null && pyramid[r + 1][c + 1] == null))
+                        {
+                            pyramid[r][c].IsFaceUp = true;
                         }
                     }
                 }
@@ -207,73 +283,68 @@ namespace SolitarioPiramide.Game
             AudioManager.PlayActionSound();
         }
 
-        private static void DisplayGameBoard()
+        private static string EscapeMarkup(string text)
         {
-            Console.Clear();
-            AnsiConsole.Write(
-            """
-            ┌──────────────────────────────────────────────────────────────────────────┐
-            │                                                                          │
-            │                               SOLITARIO                                  │
-            │                                                                          │
-            ├──────────────────────────────────────────────────────────────────────────┤
-            │
-            """);
-
-            for (int row = 0; row < 7; row++)
-            {
-                AnsiConsole.Write("│");
-                for (int i = 0; i < 7 - row; i++)
-                {
-                    AnsiConsole.Write("   ");
-                }
-                for (int col = 0; col < row + 1; col++)
-                {
-                    AnsiConsole.Write(pyramid[row][col] != null ? pyramid[row][col].ToString() : "[  ]");
-                    AnsiConsole.Write(" ");
-                }
-                AnsiConsole.Write(" │\n");
-            }
-
-            AnsiConsole.Write(
-            """
-            │                                                                          │
-            │                     ( D )  ( C )                 ( B )                   │
-            │                                                                          │
-            ├──────────────────────────────────────────────────────────────────────────┤
-            │                                                                          │
-            │                             SOLITARIO PIRAMIDE                           │
-            │                                                                          │
-            │                                                                          │
-            │      TIPO DE JUEGO : PIRÁMIDE    |   ESTADISTICAS DE VICTORIA 0.6%       │
-            │                                                                          │
-            ├──────────────────────────────────────────────────────────────────────────┤
-            │     Intrucciones:                              Valor de las Cartas:      │
-            │                                                                          │
-            │   Se crea un mazo aleatorio, o una piramide    As: 1 punto               │
-            │   de cartas, intenta juntar 2 cartas que sus   2 a 10: su valor numérico │
-            │   valores sumen un total de 13 hasta que se    Jota (J): 11 puntos       │
-            │   termine la piramide y podras ganar,          Reina (Q): 12 puntos      │
-            │   el                                           Rey (K): 13 puntos        │
-            │                                                                          │
-            └──────────────────────────────────────────────────────────────────────────┘
-            """);
+            return text.Replace("[", "[[").Replace("]", "]]");
         }
 
-        private static void DisplayCards()
+        private static void DisplayGameBoard(Card stockCard = null)
         {
+            Console.Clear();
+
+            AnsiConsole.Write(
+            """
+┌──────────────────────────────────────────────────────────────────────────┐
+│                                                                          │
+│                               SOLITARIO                                  │
+│                                                                          │
+├──────────────────────────────────────────────────────────────────────────┤
+│
+""");
+
             for (int row = 0; row < 7; row++)
             {
-                string rowStr = "";
+                AnsiConsole.Markup("│");
+                string rowStr = new string(' ', (7 - row) * 3); // Ajustar el espaciado inicial
                 for (int col = 0; col < row + 1; col++)
                 {
-                    rowStr += pyramid[row][col] != null ? pyramid[row][col].ToString() : "[  ]";
-                    rowStr += " ";
+                    rowStr += (pyramid[row][col] != null ? EscapeMarkup(pyramid[row][col].ToString()) : "[  ]") + " ";
                 }
-                AnsiConsole.WriteLine(rowStr);
+                AnsiConsole.Markup($"{rowStr.PadRight(70)}│\n"); // Ajustar el ancho del cuadro
             }
-            AnsiConsole.WriteLine($"\nStock: {stock.Count}");
-            AnsiConsole.WriteLine($"Waste: {waste.Count}");
+
+            AnsiConsole.Write(
+            """
+│                                                                          │
+│                     ( D )  ( C )                 ( B )                   │
+│                                                                          │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│                             SOLITARIO PIRAMIDE                           │
+│                                                                          │
+│                                                                          │
+│      TIPO DE JUEGO : PIRÁMIDE    |   ESTADISTICAS DE VICTORIA 0.6%       │
+│                                                                          │
+├──────────────────────────────────────────────────────────────────────────┤
+│     Instrucciones:                              Valor de las Cartas:     │
+│                                                                          │
+│   Se crea un mazo aleatorio, o una pirámide    As: 1 punto                │
+│   de cartas, intenta juntar 2 cartas que sus   2 a 10: su valor numérico  │
+│   valores sumen un total de 13 hasta que se    Jota (J): 11 puntos        │
+│   termine la pirámide y podrás ganar,          Reina (Q): 12 puntos       │
+│   el                                           Rey (K): 13 puntos         │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+""");
+
+            if (stockCard != null)
+            {
+                AnsiConsole.Markup($"\n[bold yellow]Carta del stock: {EscapeMarkup(stockCard.ToString())}[/]\n");
+            }
+
+            AnsiConsole.Markup($"\n[bold green]Stock: {stock.Count} cartas restantes[/]\n");
+            AnsiConsole.Markup($"\n[bold green]Waste: {waste.Count} cartas[/]\n");
+            AnsiConsole.Markup($"\n[bold blue]Puntuación: {score}[/]\n");
         }
     }
 }

@@ -14,8 +14,8 @@ namespace SolitarioPiramide.Audio
 
         static AudioManager()
         {
-            backgroundPlayer = new SoundPlayer("C:\\Desktop\\Escritorio 2024\\POO\\Solitario\\prueba\\SolitarioPiramide\\Audio\\1.wav");
-            actionPlayer = new SoundPlayer("C:\\Desktop\\Escritorio 2024\\POO\\Solitario\\prueba\\SolitarioPiramide\\Audio\\2.wav");
+            backgroundPlayer = new SoundPlayer("C:\\Users\\ezequ\\OneDrive\\Escritorio\\Pyramid_Solitaire\\prueba\\SolitarioPiramide\\Audio\\BackGround.wav");
+            actionPlayer = new SoundPlayer("C:\\Users\\ezequ\\OneDrive\\Escritorio\\Pyramid_Solitaire\\prueba\\SolitarioPiramide\\Audio\\Cards.wav");
         }
 
         public static void PlayBackgroundMusic()

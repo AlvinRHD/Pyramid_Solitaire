@@ -23,7 +23,7 @@ namespace SolitarioPiramide.Game
 
         public override string ToString()
         {
-            return IsFaceUp ? $"[{Rank}{Suit}]" : "[  ]";
+            return IsFaceUp ? $"{Rank}{Suit}" : "[  ]";
         }
     }
 }

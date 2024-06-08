@@ -46,9 +46,10 @@ namespace SolitarioPiramide.UI
             Jota (J): 11 puntos
             Reina (Q): 12 puntos
             Rey (K): 13 puntos
+
             """);
             AnsiConsole.Prompt(new SelectionPrompt<string>()
-                .Title("Seleccione una opción:")
+                .Title("Seleccione:")
                 .AddChoices(new[] { "Volver al menú principal" }));
 
             DisplayMainMenu();
