@@ -25,5 +25,7 @@ namespace SolitarioPiramide.Game
         {
             return IsFaceUp ? $"{Rank}{Suit}" : "[  ]";
         }
+
     }
+
 }

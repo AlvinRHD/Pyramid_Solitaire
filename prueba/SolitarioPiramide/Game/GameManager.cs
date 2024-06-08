@@ -62,7 +62,10 @@ namespace SolitarioPiramide.Game
             {
                 DisplayGameBoard(stockCard); // Mostrar el tablero actual con la carta del stock
 
-                var input = AnsiConsole.Ask<string>("Seleccione dos cartas que sumen 13 (formato: fila1,col1 fila2,col2), 's' para sacar una carta del stock, o 'w' para usar la carta del waste:");
+                var input = AnsiConsole.Ask<string>("Seleccione dos cartas que sumen 13 (formato: fila1,col1 fila2,col2), " +
+                    "'s' para sacar una carta del stock, " +
+                    "'w' para usar la carta seleccionada del stock y si la 'k' sale en el stock se elimina automaticamente al seleccionar w" +
+                    ", 'k' para eliminar un Rey de la piramide:");
 
                 if (input.ToLower() == "s")
                 {
@@ -70,42 +73,82 @@ namespace SolitarioPiramide.Game
                     if (waste.Count > 0)
                     {
                         stockCard = waste[waste.Count - 1]; // Obtener la última carta del waste
+                        Console.WriteLine($"stockCard after drawing: {stockCard.ToString()}"); // Depuración
+                    }
+                    else
+                    {
+                        stockCard = null;
                     }
                 }
                 else if (input.ToLower() == "w")
                 {
                     if (stockCard != null)
                     {
-                        AnsiConsole.Markup($"[bold yellow]Estás usando la carta del stock: {EscapeMarkup(stockCard.ToString())}[/]\n");
-                        var selection = AnsiConsole.Ask<string>("Seleccione una carta en la pirámide que sume 13 con la carta del stock (formato: fila,col):");
-                        var card = selection.Split(',');
-
-                        if (card.Length == 2 &&
-                            int.TryParse(card[0], out int row) &&
-                            int.TryParse(card[1], out int col) &&
-                            IsWithinBounds(row, col))
+                        if (stockCard.Value == 13) // Verificar si la carta del stock es un Rey
                         {
-                            if (pyramid[row][col] != null && pyramid[row][col].IsFaceUp &&
-                                stockCard.Value + pyramid[row][col].Value == 13)
-                            {
-                                UpdateBoard(row, col); // Llamada a la versión de dos parámetros
-                                waste.Remove(stockCard);
-                                stockCard = null;
-                                PlayActionSound();
-                            }
-                            else
-                            {
-                                AnsiConsole.Markup("[bold red]Selección inválida, intenta de nuevo.[/]\n");
-                            }
+                            AnsiConsole.Markup($"[bold yellow]Eliminando la carta K del stock: {EscapeMarkup(stockCard.ToString())}[/]\n");
+                            waste.Remove(stockCard);
+                            stockCard = null;
+                            PlayActionSound();
                         }
                         else
                         {
-                            AnsiConsole.Markup("[bold red]Entrada no válida, intenta de nuevo.[/]\n");
+                            AnsiConsole.Markup($"[bold yellow]Estás usando la carta del stock: {EscapeMarkup(stockCard.ToString())}[/]\n");
+                            var selection = AnsiConsole.Ask<string>("Seleccione una carta en la pirámide que sume 13 con la carta del stock (formato: fila,col):");
+                            var card = selection.Split(',');
+
+                            if (card.Length == 2 &&
+                                int.TryParse(card[0], out int row) &&
+                                int.TryParse(card[1], out int col) &&
+                                IsWithinBounds(row, col))
+                            {
+                                if (pyramid[row][col] != null && pyramid[row][col].IsFaceUp &&
+                                    stockCard.Value + pyramid[row][col].Value == 13)
+                                {
+                                    UpdateBoard(row, col); // Llamada a la versión de dos parámetros
+                                    waste.Remove(stockCard);
+                                    stockCard = null;
+                                    PlayActionSound();
+                                }
+                                else
+                                {
+                                    AnsiConsole.Markup("[bold red]Selección inválida, intenta de nuevo.[/]\n");
+                                }
+                            }
+                            else
+                            {
+                                AnsiConsole.Markup("[bold red]Entrada no válida, intenta de nuevo.[/]\n");
+                            }
                         }
                     }
                     else
                     {
                         AnsiConsole.Markup("[bold red]No hay carta en el stock para usar.[/]\n");
+                    }
+                }
+                else if (input.ToLower() == "k")
+                {
+                    var selection = AnsiConsole.Ask<string>("Seleccione la posición de la carta K en la pirámide (formato: fila,col):");
+                    var card = selection.Split(',');
+
+                    if (card.Length == 2 &&
+                        int.TryParse(card[0], out int row) &&
+                        int.TryParse(card[1], out int col) &&
+                        IsWithinBounds(row, col))
+                    {
+                        if (pyramid[row][col] != null && pyramid[row][col].IsFaceUp && pyramid[row][col].Value == 13)
+                        {
+                            UpdateBoard(row, col); // Eliminar la carta K
+                            PlayActionSound();
+                        }
+                        else
+                        {
+                            AnsiConsole.Markup("[bold red]Selección inválida, intenta de nuevo.[/]\n");
+                        }
+                    }
+                    else
+                    {
+                        AnsiConsole.Markup("[bold red]Entrada no válida, intenta de nuevo.[/]\n");
                     }
                 }
                 else
@@ -150,11 +193,14 @@ namespace SolitarioPiramide.Game
             EndGame();
         }
 
+
+
         private static void DrawFromStock()
         {
             if (stock.Count > 0)
             {
                 Card drawnCard = stock[0];
+                drawnCard.IsFaceUp = true; // Asegurar que la carta del stock esté boca arriba
                 stock.RemoveAt(0);
                 waste.Add(drawnCard);
                 AnsiConsole.Markup($"[bold yellow]Sacaste una carta del stock: {EscapeMarkup(drawnCard.ToString())}[/]\n");
@@ -260,7 +306,8 @@ namespace SolitarioPiramide.Game
 
         private static void EndGame()
         {
-            AnsiConsole.Markup("[bold yellow]El juego ha terminado![/]\n");
+            AnsiConsole.Clear();
+            AnsiConsole.Markup("[bold red]¡Juego terminado![/]\n");
             AnsiConsole.Markup($"[bold green]Puntuación: {score}[/]\n");
 
             if (AnsiConsole.Confirm("¿Quieres jugar de nuevo?"))
@@ -285,14 +332,18 @@ namespace SolitarioPiramide.Game
 
         private static string EscapeMarkup(string text)
         {
-            return text.Replace("[", "[[").Replace("]", "]]");
+            if (string.IsNullOrEmpty(text))
+            {
+                return "  ";
+            }
+            return text.Replace("[", "[").Replace("]", "]");
         }
 
         private static void DisplayGameBoard(Card stockCard = null)
         {
             Console.Clear();
 
-            AnsiConsole.Write(
+            Console.WriteLine(
             """
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                                                                          │
@@ -304,16 +355,16 @@ namespace SolitarioPiramide.Game
 
             for (int row = 0; row < 7; row++)
             {
-                AnsiConsole.Markup("│");
+                Console.Write("│");
                 string rowStr = new string(' ', (7 - row) * 3); // Ajustar el espaciado inicial
                 for (int col = 0; col < row + 1; col++)
                 {
-                    rowStr += (pyramid[row][col] != null ? EscapeMarkup(pyramid[row][col].ToString()) : "[  ]") + " ";
+                    rowStr += "[" + (pyramid[row][col] != null ? EscapeMarkup(pyramid[row][col].ToString()) : "  ") + "] ";
                 }
-                AnsiConsole.Markup($"{rowStr.PadRight(70)}│\n"); // Ajustar el ancho del cuadro
+                Console.WriteLine($"{rowStr.PadRight(70)}│"); // Ajustar el ancho del cuadro
             }
 
-            AnsiConsole.Write(
+            Console.WriteLine(
             """
 │                                                                          │
 │                     ( D )  ( C )                 ( B )                   │
@@ -328,23 +379,27 @@ namespace SolitarioPiramide.Game
 ├──────────────────────────────────────────────────────────────────────────┤
 │     Instrucciones:                              Valor de las Cartas:     │
 │                                                                          │
-│   Se crea un mazo aleatorio, o una pirámide    As: 1 punto                │
-│   de cartas, intenta juntar 2 cartas que sus   2 a 10: su valor numérico  │
-│   valores sumen un total de 13 hasta que se    Jota (J): 11 puntos        │
-│   termine la pirámide y podrás ganar,          Reina (Q): 12 puntos       │
-│   el                                           Rey (K): 13 puntos         │
+│   Se crea un mazo aleatorio, o una pirámide    As: 1 punto               │
+│   de cartas, intenta juntar 2 cartas que sus   2 a 10: su valor numérico │
+│   valores sumen un total de 13 hasta que se    Jota (J): 11 puntos       │
+│   termine la pirámide y podrás ganar,          Reina (Q): 12 puntos      │
+│   el                                           Rey (K): 13 puntos        │
 │                                                                          │
 └──────────────────────────────────────────────────────────────────────────┘
 """);
 
             if (stockCard != null)
             {
-                AnsiConsole.Markup($"\n[bold yellow]Carta del stock: {EscapeMarkup(stockCard.ToString())}[/]\n");
+                Console.WriteLine($"\nCarta del stock: [{EscapeMarkup(stockCard.ToString())}]\n");
+            }
+            else
+            {
+                Console.WriteLine($"\nCarta del stock: [  ]\n");
             }
 
-            AnsiConsole.Markup($"\n[bold green]Stock: {stock.Count} cartas restantes[/]\n");
-            AnsiConsole.Markup($"\n[bold green]Waste: {waste.Count} cartas[/]\n");
-            AnsiConsole.Markup($"\n[bold blue]Puntuación: {score}[/]\n");
+            Console.WriteLine($"\nStock: {stock.Count} cartas restantes\n");
+            Console.WriteLine($"\nWaste: {waste.Count} cartas\n");
+            Console.WriteLine($"\nPuntuación: {score}\n");
         }
     }
 }
