@@ -1,0 +1,8 @@
+Tarea Solitario Pirámide:
+
+Roberto Iglesias (U20230727)
+Jorge Lara (U20230258)
+Alvin Ezequiel (U20230560)
+
+Link de GitHub: 
+https://github.com/AlvinRHD/Pyramid_Solitaire.git
